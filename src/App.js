@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import * as topojson from "topojson-client";
 import * as d3 from "d3";
 import * as Plot from  "@observablehq/plot";
-import tweetData from "./data/tweet_sentiment_geo2.csv";
+import tweetData from "./data/tweet_sentiment_geo.csv";
 
 function App() {
   const containerRef = useRef();
@@ -26,6 +26,10 @@ function App() {
       if (!sentData) return;
       const countySet = new Set(sentData.map((d) => d.county_code));
       const newGeoData = Object.create(geoData);
+      newGeoData.objects.states = {
+        type: "GeometryCollection",
+        geometries: newGeoData.objects.states.geometries.filter(d => d.id !== "02" && d.id !== "15")
+      }
       newGeoData.objects.counties.geometries = geoData.objects.counties.geometries.filter((county) => countySet.has(county.id));
       return newGeoData;
     }
@@ -38,31 +42,7 @@ function App() {
 
   /* useEffect(() => {
     if (!mapData) return;
-    console.log(mapData);
-    console.log(mapData.objects.counties);
-    const countymap = new Map(topojson.feature(mapData, mapData.objects.counties).features.map(d => [d.id, d]));
-    console.log(countymap);
-
-    if (!sentData) return;
-    console.log(sentData);
-
-    const countySet = new Set(sentData.map((d) => d.county_code));
-    console.log("Getting set data...");
-    console.log(countySet);
-
-    const newMapData = mapData.objects.counties.geometries.filter((county) => countySet.has(county.id));
-    console.log("New map data after filtering:");
-    console.log(newMapData.length);
-    console.log(newMapData);
-
-    console.log("Getting lookup...");
-    console.log(countymap.get("04013"));
-  }, [sentData, mapData]); */
-
-  useEffect(() => {
-    if (!mapData) return;
     const nation = topojson.feature(mapData, mapData.objects.nation);
-    // const statemap = new Map(topojson.feature(mapData, mapData.objects.states).features.map(d => [d.id, d]));
     const countymap = new Map(topojson.feature(mapData, mapData.objects.counties).features.map(d => [d.id, d]));
     const statemesh = topojson.mesh(mapData, mapData.objects.states, (a, b) => a !== b)
     console.log(countymap);
@@ -116,7 +96,9 @@ function App() {
     });
     containerRef.current.append(plot);
     return () => plot.remove();
-  }, [sentData]);
+  }, [sentData]); */
+
+  
 
   return (
     <>
