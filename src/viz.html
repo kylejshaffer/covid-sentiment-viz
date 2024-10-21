@@ -23,6 +23,7 @@
                     sentiment: Math.abs(Number(d.sentiment)),
                     metro_area: d.metro_area,
                     county_code: String(d.county_code),
+                    count_val: Math.floor(Math.random() * (50 - 10) + 10)
                 }
             });
 
@@ -91,7 +92,9 @@
                 console.log(date);
                 dot // enter
                     .filter(d => d.date > previousDate && d.date <= date)
-                    .transition().attr("r", d => d.sentiment * 100);
+                    .transition()
+                    .duration(500)
+                    .attr("r", d => d.count_val);
                 dot // exit
                     .filter(d => d.date <= previousDate && d.date > date)
                     .transition().attr("r", 0);
