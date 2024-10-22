@@ -3,24 +3,26 @@
 <head>
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="index.css">
+    <script src="colorlegend.js"></script>
     <script src="https://unpkg.com/d3@7"></script>
     <script src="https://unpkg.com/topojson-client@3"></script>
     <script src="https://unpkg.com/htl@0.3"></script>
     <script src="https://unpkg.com/@observablehq/inputs@0.10"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
     <title>Twitter Sentiment During Early Covid</title>
 </head>
 <body>
     <div style="margin-top:0; margin-left: 20%; margin-right: 10%;">
-        <div style="margin-left: 20%;">
+        <div id="text-container" style="margin-left: 20%;">
             <h1>Twitter Sentiment Map During <br/> the Start of COVID-19</h1>
             <h5>
-                This map visualizes overall sentiment and number of tweets<br/>
-                for a set of large metropolitan areas. Select a month from<br/>
-                the dropdown menu. The circles drawn over each metro area<br/>
-                indicate the number of tweets by cirlce size, and the overall<br/>
-                sentiment with the intensity of color (darker is more positive,<br/>
-                lighter, more negative). Hover over each circle for tooltips<br/>
-                containing more data about each area.
+                This map visualizes overall sentiment and number of tweets for a set<br/>
+                of large metropolitan areas. Select a month from the dropdown menu.<br/>
+                The circles drawn over each metro area indicate the number of tweets <br/>
+                by cirlce size, and the overall sentiment with the intensity of color <br/>
+                (darker is more positive, lighter, more negative). Hover over each circle<br/>
+                for tooltips containing more data about each area. You can read more about <br/>
+                the dataset <a href="https://zenodo.org/records/4434972">here</a>.
             </h5>
             <select name="month-selector" id="month-selector">
                 <option value="" selected>Select Month</option>
@@ -98,7 +100,10 @@
             const sentData = await getSentData();
             const us = await getGeoData(sentData);
             const countymap = new Map(topojson.feature(us, us.objects.counties).features.map(d => [d.id, d]));
-            const color = d3.scaleSequential(d3.extent(Array.from(sentData.map(d => d.sentiment))), d3.interpolateReds).nice();
+            const color = d3.scaleSequential(d3.extent(Array.from(sentData.map(d => d.sentiment))), d3.interpolateReds).nice();            
+            const colorLegend = Legend(d3.scaleSequential([-0.1, 0.2], d3.interpolateReds), {
+                title: "Sentiment Index",
+            });
 
             console.log("sentiment data:");
             console.log(sentData);
@@ -112,6 +117,8 @@
                 .attr("height", 610)
                 .attr("viewBox", [0, 0, 975, 610])
                 .attr("style", "max-width: 100%; height: auto;");
+            
+            d3.select("#text-container").node().appendChild(colorLegend);
 
             svg.append("path")
                 .datum(topojson.merge(us, us.objects.states.geometries))
@@ -151,11 +158,8 @@
             
             const dropdown = document.getElementById("month-selector");
             dropdown.addEventListener('change', function() {
-                let month = +this.value;
-                console.log(month);
-                
+                let month = +this.value;                
                 let filteredData = sentData.filter(d => d.month_num === month);
-                console.log(filteredData);
                 dot.data(filteredData)
                     .transition()
                     .duration(1000)
