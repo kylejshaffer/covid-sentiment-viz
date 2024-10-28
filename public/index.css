@@ -11,13 +11,6 @@ code {
     monospace;
 }
 
-#container {
-  display: flex;
-  position: fixed;
-  justify-content: center;
-  align-items: center;
-}
-
 .tooltip {
   position: absolute;
   text-align: left;
